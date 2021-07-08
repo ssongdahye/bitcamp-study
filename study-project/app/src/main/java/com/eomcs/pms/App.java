@@ -12,6 +12,7 @@ import java.util.Scanner;
 //7) 특정 조건에 따라 반복을 멈춘다.
 //8) 날짜의 출력형식을 "yyyy-MM-dd"로 변경한다.
 public class App {
+
   public static void main(String[] args) {
     System.out.println("[회원]");
 
@@ -29,9 +30,8 @@ public class App {
 
     int size = 0;
 
-    for (int i = 0; i < MAX_LENGTH; i = i + 1) {
+    for (int i=0; i < MAX_LENGTH; i++) {
       size = size + 1;
-
       System.out.print("번호? ");
       no[i] = Integer.parseInt(keyboardScan.nextLine());
       System.out.print("이름? ");
@@ -45,10 +45,9 @@ public class App {
       System.out.print("전화? ");
       tel[i] = keyboardScan.nextLine();
       registeredDate[i] = new Date();
-
       System.out.println();
 
-      System.out.print("계속 입력하시겠습니까?(y/N) ");
+      System.out.print("계속 입력하시겠습니까? (y/N) ");
       String input = keyboardScan.nextLine();
 
       if (input.equalsIgnoreCase("N") || input.equals("")) {
@@ -58,18 +57,12 @@ public class App {
       System.out.println();
     }
 
-
     keyboardScan.close(); // 데이터 입출력이 끝났으면 도구를 닫는다.
 
     System.out.println("--------------------------------");
 
-    for (int i = 0; i < size; i = i + 1) {
-      System.out.printf("%d, %s, %s, %s, %5$tY-%5$tm-%5$td\n", 
-          no[i],
-          name[i],
-          email[i],
-          tel[i],
-          registeredDate[i]);
+    for (int i = 0; i < size; i++) {
+      System.out.printf("%d, %s, %s, %s, %5$tY-%5$tm-%5$td\n", no[i], name[i], email[i], tel[i], registeredDate[i]);
     }
 
   }
