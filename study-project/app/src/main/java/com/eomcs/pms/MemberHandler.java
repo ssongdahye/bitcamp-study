@@ -1,23 +1,18 @@
-package com.eomcs.pms.handler;
+package com.eomcs.pms;
 
 import java.sql.Date;
-import com.eomcs.pms.domain.Member;
-import com.eomcs.util.Prompt;
 
 public class MemberHandler {
+  // 회원 정보
+  static final int MAX_LENGTH = 100;
 
-  static final int MAX_LENGTH = 5;
-
-  // Member 인스턴스의 주소를 저장할 레퍼런스를 3개 생성한다.
   static Member[] members = new Member[MAX_LENGTH];
+
   static int size = 0;
 
-  // 다른 패키지에 있는 App 클래스가 다음 메서드를 호출할 수 있도록 공개한다.
-  public static void add() {
+  static void add() {
     System.out.println("[회원 등록]");
 
-    // 새 회원 정보를 담을 변수를 준비한다.
-    // 낱 개의 변수가 아니라 Member에 정의된 대로 묶음 변수를 만든다.
     Member member = new Member();
 
     member.no = Prompt.inputInt("번호? ");
@@ -29,15 +24,14 @@ public class MemberHandler {
     member.registeredDate = new Date(System.currentTimeMillis());
 
     members[size++] = member;
-
   }
 
-  //다른 패키지에 있는 App 클래스가 다음 메서드를 호출할 수 있도록 공개한다.
-  public static void list() {
+  static void list() {
     System.out.println("[회원 목록]");
     for (int i = 0; i < size; i++) {
-      System.out.printf("%d, %s, %s, %s, %s\n", 
-          members[i].no, 
+      // 번호, 이름, 이메일, 전화, 가입일
+      System.out.printf("%d, %s, %s, %s, %s\n", // 출력 형식 지정
+          members[i].no,
           members[i].name, 
           members[i].email, 
           members[i].tel, 
