@@ -1,5 +1,6 @@
 package com.eomcs.pms.handler;
 
+import java.sql.Date;
 import com.eomcs.pms.domain.Task;
 import com.eomcs.util.Prompt;
 
@@ -64,6 +65,72 @@ public class TaskHandler {
           stateLabel, 
           this.tasks[i].owner);
     }
+  }
+
+  public void update() {
+
+    System.out.println("[작업 정보 변경]");
+    int no = Prompt.inputInt("번호? ");
+    Task task = null;
+
+    for(int i = 0; i < this.size; i++) {
+      if(this.tasks[i].no == no) {
+        task = tasks[i];
+        break;
+      }
+    }
+
+    if(task == null) {
+      System.out.println("작업 정보가 존재하지 않습니다.");
+      return;
+    }
+
+    String content = Prompt.inputString("작업 내용(" + task.content + ")? ");
+    Date deadline = Prompt.inputDate("마감일("+ task.deadline + ")? ");
+    String input = Prompt.inputString("정말 변경하시겠습니까?(y/N) ");
+
+    if(input.equalsIgnoreCase("n") || input.length() == 0) {
+      System.out.println("작업 정보 변경을 취소합니다.");
+      return;
+    }
+
+    task.content = content;
+    task.deadline = deadline;
+    System.out.println("작업 정보 변경을 완료하였습니다.");
+  }
+
+  public void delete() {
+
+    System.out.println("[작업 삭제]");
+    int no = Prompt.inputInt("번호? ");
+    //Task task = null;
+    int taskIndex = -1;
+
+    for(int i = 0; i < this.size; i++) {
+      if(this.tasks[i].no == no) {
+        taskIndex = i;
+        break;
+      }
+    }
+
+    if(taskIndex == -1) {
+      System.out.println("작업 정보가 존재하지 않습니다.");
+      return;
+    }
+
+    String input = Prompt.inputString("정말 삭제하시겠습니까?(y/N) ");
+
+    if(input.equalsIgnoreCase("n") || input.length() == 0) {
+      System.out.println("작업 삭제를 취소하였습니다.");
+      return;
+    }
+
+    for(int i = taskIndex + 1; i < this.size; i++) {
+      this.tasks[i - 1] = this.tasks[i];
+    }
+
+    this.tasks[--this.size] = null;
+    System.out.println("작업 삭제를 완료하였습니다.");
   }
 
 }

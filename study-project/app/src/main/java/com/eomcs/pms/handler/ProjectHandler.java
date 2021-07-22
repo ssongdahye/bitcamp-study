@@ -66,5 +66,74 @@ public class ProjectHandler {
     }
   }
 
+  public void update() {
+
+    System.out.println("[프로젝트 정보 변경]");
+
+    int no = Prompt.inputInt("번호? ");
+    Project project = null;
+
+    for(int i = 0; i < this.size; i++) {
+      if(this.projects[i].no == no) {
+        project = this.projects[i];
+        break;
+      }
+    }
+
+    if(project == null) {
+      System.out.println("해당 번호의 프로젝트가 존재하지 않습니다");
+      return;
+    }
+
+    String title = Prompt.inputString("프로젝트명(" + project.title + ")? ");
+    String owner = Prompt.inputString("만든이(" + project.owner + ")? ");
+
+    String input = Prompt.inputString("정말 변경하시겠습니까?(y/N)? ");
+
+    if(input.equalsIgnoreCase("n") || input.length() == 0) {
+      System.out.println("프로젝트 변경을 취소합니다.");
+      return;
+    }
+
+    project.title = title;
+    project.owner = owner;
+    System.out.println("프로젝트 변경을 완료하였습니다.");
+  }
+
+  public void delete() {
+
+    System.out.println("[프로젝트 삭제]");
+
+    int no = Prompt.inputInt("번호? ");
+    Project project = null;
+    int projectIndex = -1;
+
+    for(int i = 0; i < this.size; i++) {
+      if(this.projects[i].no == no) {
+        projectIndex = i;
+        break;
+      }
+    }
+
+    if(projectIndex == -1) {
+      System.out.println("삭제할 프로젝트가 존재하지 않습니다.");
+      return;
+    }
+
+    String input = Prompt.inputString("정말 삭제하시겠습니까?(y/N) ");
+
+    if(input.equalsIgnoreCase("n") || input.length() == 0) {
+      System.out.println("프로젝트 삭제를 취소합니다.");
+      return;
+    }
+
+    for(int i = projectIndex + 1; i < this.size; i ++) {
+      this.projects[i - 1] = this.projects[i];
+    }
+
+    this.projects[--this.size] = null;
+
+    System.out.println("프로젝트를 삭제하였습니다.");
+  }
 
 }

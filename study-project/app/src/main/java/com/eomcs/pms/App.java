@@ -31,19 +31,37 @@ public class App {
       } else if (input.equals("/member/list")) {
         memberHandler.list();
 
-      }  else if (input.equals("/project/add")) {
+      } else if (input.equals("/member/update")) {
+        memberHandler.update();
+
+      } else if (input.equals("/member/delete")) {
+        memberHandler.delete();
+
+      } else if (input.equals("/project/add")) {
         projectHandler.add(memberHandler);
 
       }  else if (input.equals("/project/list")) {
         projectHandler.list();
 
+      }  else if (input.equals("/project/update")) {
+        projectHandler.update();
+
+      }  else if (input.equals("/project/delete")) {
+        projectHandler.delete();
+
       }  else if (input.equals("/task/add")) {
         taskHandler.add(memberHandler);
 
-      }  else if (input.equals("/task/list")) {
+      } else if (input.equals("/task/list")) {
         taskHandler.list();
 
-      }  else if (input.equals("/board/add")) {
+      } else if (input.equals("/task/update")) {
+        taskHandler.update();
+
+      } else if (input.equals("/task/delete")) {
+        taskHandler.delete();
+
+      } else if (input.equals("/board/add")) {
         // BoardHandler의 add()를 실행할 때
         // add()에서 사용할 게시글 배열이 있는 인스턴스 주소를 넘겨준다.
         boardHandler.add();
