@@ -13,11 +13,11 @@ public class Exam0620 {
     // - 바이트코드(Exam0620$A.class)를 확인해 보라.
     //
     static {
-      System.out.println("Static{} 11111");
+      System.out.println("Static{} 11111, a: " + a);
     }
 
     static {
-      System.out.println("Static{} 22222");
+      System.out.println("Static{} 22222, a: " + a);
     }
   }
 
@@ -27,7 +27,7 @@ public class Exam0620 {
     // 1) 클래스 멤버(필드와 메서드)를 최초로 사용할 때
     A.a = 100;
 
-    System.out.println("종료!");
+    System.out.println("종료!, a: " + A.a);
   }
 }
 

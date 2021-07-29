@@ -53,76 +53,97 @@ public class MemberHandler {
     return false;
   }
 
-  public void update() {
-    System.out.println("[회원 정보 변경]");
+  public void detail() {
+    System.out.println("[회원 상세보기]");
+    int no = Prompt.inputInt("번호? ");
 
-    String name = Prompt.inputString("이름? ");
+    Member member = findByNo(no);
 
-    Member member = null;
-
-    for (int i = 0; i < this.size; i ++) {
-      if(this.members[i].name.equals(name)) {
-        member = this.members[i];
-        break;
-      }
-    }
-
-    if(member == null) {
+    if (member == null) {
       System.out.println("해당 번호의 회원이 없습니다.");
       return;
     }
 
-    String email = Prompt.inputString("이메일(" + member.email + ")? ");
-    String tel = Prompt.inputString("전화번호(" + member.tel + ")? ");
+    System.out.printf("이름: %s\n", member.name);
+    System.out.printf("이메일: %s\n", member.email);
+    System.out.printf("사진: %s\n", member.photo);
+    System.out.printf("전화: %s\n", member.tel);
+    System.out.printf("등록일: %s\n", member.registeredDate);
+  }
 
-    String input = Prompt.inputString("정말 변경하시겠습니까?(y/N) ");
+  public void update() {
+    System.out.println("[회원 변경]");
+    int no = Prompt.inputInt("번호? ");
 
-    if (input.equalsIgnoreCase("n") || input.length() == 0) {
-      System.out.println("회원 정보 변경을 취소하였습니다.");
+    Member member = findByNo(no);
+
+    if (member == null) {
+      System.out.println("해당 번호의 회원이 없습니다.");
       return;
     }
 
-    member.email = email;
-    member.tel = tel;
-    System.out.println("회원 정보를 변경하였습니다.");
+    String name = Prompt.inputString("이름(" + member.name  + ")? ");
+    String email = Prompt.inputString("이메일(" + member.email + ")? ");
+    String password = Prompt.inputString("암호? ");
+    String photo = Prompt.inputString("사진(" + member.photo + ")? ");
+    String tel = Prompt.inputString("전화(" + member.tel + ")? ");
 
+    String input = Prompt.inputString("정말 변경하시겠습니까?(y/N) ");
+    if (input.equalsIgnoreCase("n") || input.length() == 0) {
+      System.out.println("회원 변경을 취소하였습니다.");
+      return;
+    }
+
+    member.name = name;
+    member.email = email;
+    member.password = password;
+    member.photo = photo;
+    member.tel = tel;
+
+    System.out.println("회원을 변경하였습니다.");
   }
 
   public void delete() {
     System.out.println("[회원 삭제]");
-
     int no = Prompt.inputInt("번호? ");
 
-    Member member = null;
-    int memberIndex = -1;
+    int index = indexOf(no);
 
-    for(int i = 0; i < this.size; i++) {
-      if(this.members[i].no == no) {
-        member = members[i];
-        memberIndex = i;
-        break;
-      }
-    }
-
-    if(memberIndex == -1) {
-      System.out.println("해당 번호의 회원이 존재하지 않습니다.");
+    if (index == -1) {
+      System.out.println("해당 번호의 회원이 없습니다.");
       return;
     }
 
     String input = Prompt.inputString("정말 삭제하시겠습니까?(y/N) ");
-
-    if(input.equalsIgnoreCase("n") || input.length() == 0) {
+    if (input.equalsIgnoreCase("n") || input.length() == 0) {
       System.out.println("회원 삭제를 취소하였습니다.");
       return;
     }
 
-    for(int i = memberIndex + 1; i < this.size; i++) {
+    for (int i = index + 1; i < this.size; i++) {
       this.members[i - 1] = this.members[i];
     }
-
     this.members[--this.size] = null;
 
-    System.out.println("회원 삭제를 완료하였습니다.");
+    System.out.println("회원을 삭제하였습니다.");
+  }
+
+  private Member findByNo(int no) {
+    for (int i = 0; i < this.size; i++) {
+      if (this.members[i].no == no) {
+        return this.members[i];
+      }
+    }
+    return null;
+  }
+
+  private int indexOf(int no) {
+    for (int i = 0; i < this.size; i++) {
+      if (this.members[i].no == no) {
+        return i;
+      }
+    }
+    return -1;
   }
 }
 
