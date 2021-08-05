@@ -25,11 +25,9 @@ public class BoardHandler {
   public void list() {
     System.out.println("[게시글 목록]");
 
-    Object[] list = boardList.toArray();
+    Board[] list = boardList.toArray();
 
-    for (Object obj : list) {
-      Board board = (Board) obj;
-
+    for (Board board : list) {
       System.out.printf("%d, %s, %s, %s, %d, %d\n", 
           board.no, 
           board.title, 
@@ -104,6 +102,10 @@ public class BoardHandler {
 
     System.out.println("게시글을 삭제하였습니다.");
   }
+
+
+
+
 }
 
 
