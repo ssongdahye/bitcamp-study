@@ -29,7 +29,7 @@ public interface Computer {
   //
   // 기존 규칙을 변경하되, 기존 구현체(기존 규칙에 따라 작성한 클래스)에는 영향을 끼치고 싶지 않을 때
   // 바로 다음 문법을 사용하라!
-  // "디폴트 메서드(default method)" - JDK8에서 추가한 문법이다.
+  // "디폴트 메서드(default method)" - JAVA8에서 추가한 문법이다.
   //
   default void touch() {
     // 구현할 코드 있으면 작성하고, 없으면 빈 채로 둔다.
