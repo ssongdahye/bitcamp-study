@@ -23,10 +23,13 @@ class D {
 
       void f() {
         int v4 = 4;
-        System.out.printf("v4 = %d\n", v4);
-        System.out.printf("v3 = %d\n", this.v3);
-        System.out.printf("v2 = %d\n", v2);
-        System.out.printf("v1 = %d\n", D.this.v1);
+        System.out.printf("v4 = %d\n", v4); // f()의 로컬 변수
+        System.out.printf("v3 = %d\n", this.v3); // X 인스턴스의 변수
+        System.out.printf("v1 = %d\n", D.this.v1); // D의 인스턴스 변수
+
+        // 바깥 메서드의 로컬 변수를 사용할 때는
+        // 자신의 메서드인양 사용하면 된다.
+        System.out.printf("v2 = %d\n", v2); // D.m1()의 로컬변수
       }
     }
 

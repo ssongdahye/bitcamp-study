@@ -1,4 +1,4 @@
-// 인스턴스 메서드에 정의된 local class : 메서드에 선언된 로컬 변수 접근하기
+// 로컬 클래스에서 메서드에 선언된 로컬 변수 접근하기
 package com.eomcs.oop.ex11.d;
 
 class D3 {

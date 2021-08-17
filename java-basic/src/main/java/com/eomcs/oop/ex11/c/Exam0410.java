@@ -1,6 +1,9 @@
 // inner class : import 사용
 package com.eomcs.oop.ex11.c;
 
+// 중첩 클래스를 직접 import 할 수 있다.
+// => import 가 하는 일은 클래스를 로딩하는 것이 아니다!
+// => 컴파일러에게 클래스의 위치를 알려주는 것이다.
 import com.eomcs.oop.ex11.c.D.X;
 import com.eomcs.oop.ex11.c.sub.M;
 import com.eomcs.oop.ex11.c.sub.M.Y;
