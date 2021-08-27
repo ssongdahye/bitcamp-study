@@ -62,7 +62,9 @@ public class Exam0140 {
     System.out.printf("hashCode(): %d, %d\n", k3.hashCode(), k6.hashCode());
     System.out.println("-----------------------------------");
 
-    // hashCode()의 리턴 값이 같다고 해서 같은 key로 간주하지 않는다.
+    // hashCode()의 리턴 값이 같더라도
+    // equals()로 비교한 값이 false이면
+    // 다른 key로 간주한다.
     System.out.println(map.get(k6));
   }
 
