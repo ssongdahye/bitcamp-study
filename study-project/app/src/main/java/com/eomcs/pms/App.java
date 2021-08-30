@@ -9,6 +9,7 @@ import com.eomcs.pms.domain.Board;
 import com.eomcs.pms.domain.Member;
 import com.eomcs.pms.domain.Project;
 import com.eomcs.pms.domain.Task;
+import com.eomcs.pms.handler.AuthHandler;
 import com.eomcs.pms.handler.BoardHandler;
 import com.eomcs.pms.handler.MemberHandler;
 import com.eomcs.pms.handler.ProjectHandler;
@@ -26,6 +27,7 @@ public class App {
   MemberHandler memberHandler = new MemberHandler(memberList);
   ProjectHandler projectHandler = new ProjectHandler(projectList, memberHandler);
   TaskHandler taskHandler = new TaskHandler(taskList, memberHandler);
+  AuthHandler authHandler = new AuthHandler(memberList);
 
   public static void main(String[] args) {
     App app = new App(); 
@@ -41,10 +43,29 @@ public class App {
     MenuGroup mainMenuGroup = new MenuGroup("메인");
     mainMenuGroup.setPrevMenuTitle("종료");
 
+    mainMenuGroup.add(new Menu("로그인", Menu.ENABLE_LOGOUT) {
+      @Override
+      public void execute() {
+        authHandler.login();
+      }
+    });
+    mainMenuGroup.add(new Menu("내정보", Menu.ENABLE_LOGIN) {
+      @Override
+      public void execute() {
+        authHandler.displayLoginUser();
+      }
+    });
+    mainMenuGroup.add(new Menu("로그아웃", Menu.ENABLE_LOGIN) {
+      @Override
+      public void execute() {
+        authHandler.logout();
+      }
+    });
+
     MenuGroup boardMenu = new MenuGroup("게시판");
     mainMenuGroup.add(boardMenu);
 
-    boardMenu.add(new Menu("등록") {
+    boardMenu.add(new Menu("등록", Menu.ENABLE_LOGIN) {
       public void execute() {
         boardHandler.add(); 
       }});
@@ -56,11 +77,11 @@ public class App {
       public void execute() {
         boardHandler.detail(); 
       }});
-    boardMenu.add(new Menu("변경") {
+    boardMenu.add(new Menu("변경", Menu.ENABLE_LOGIN) {
       public void execute() {
         boardHandler.update(); 
       }});
-    boardMenu.add(new Menu("삭제") {
+    boardMenu.add(new Menu("삭제", Menu.ENABLE_LOGIN) {
       public void execute() {
         boardHandler.delete(); 
       }});
@@ -68,7 +89,7 @@ public class App {
     MenuGroup memberMenu = new MenuGroup("회원");
     mainMenuGroup.add(memberMenu);
 
-    memberMenu.add(new Menu("등록") {
+    memberMenu.add(new Menu("등록", Menu.ENABLE_LOGIN) {
       public void execute() {
         memberHandler.add(); 
       }});
@@ -80,11 +101,11 @@ public class App {
       public void execute() {
         memberHandler.detail(); 
       }});
-    memberMenu.add(new Menu("변경") {
+    memberMenu.add(new Menu("변경", Menu.ENABLE_LOGIN) {
       public void execute() {
         memberHandler.update(); 
       }});
-    memberMenu.add(new Menu("삭제") {
+    memberMenu.add(new Menu("삭제", Menu.ENABLE_LOGIN) {
       public void execute() {
         memberHandler.delete(); 
       }});
@@ -92,7 +113,7 @@ public class App {
     MenuGroup projectMenu = new MenuGroup("프로젝트");
     mainMenuGroup.add(projectMenu);
 
-    projectMenu.add(new Menu("등록") {
+    projectMenu.add(new Menu("등록", Menu.ENABLE_LOGIN) {
       public void execute() {
         projectHandler.add(); 
       }});
@@ -104,11 +125,11 @@ public class App {
       public void execute() {
         projectHandler.detail(); 
       }});
-    projectMenu.add(new Menu("변경") {
+    projectMenu.add(new Menu("변경", Menu.ENABLE_LOGIN) {
       public void execute() {
         projectHandler.update(); 
       }});
-    projectMenu.add(new Menu("삭제") {
+    projectMenu.add(new Menu("삭제", Menu.ENABLE_LOGIN) {
       public void execute() {
         projectHandler.delete(); 
       }});
@@ -116,7 +137,7 @@ public class App {
     MenuGroup taskMenu = new MenuGroup("작업");
     mainMenuGroup.add(taskMenu);
 
-    taskMenu.add(new Menu("등록") {
+    taskMenu.add(new Menu("등록", Menu.ENABLE_LOGIN) {
       public void execute() {
         taskHandler.add(); 
       }});
@@ -128,11 +149,11 @@ public class App {
       public void execute() {
         taskHandler.detail(); 
       }});
-    taskMenu.add(new Menu("변경") {
+    taskMenu.add(new Menu("변경", Menu.ENABLE_LOGIN) {
       public void execute() {
         taskHandler.update(); 
       }});
-    taskMenu.add(new Menu("삭제") {
+    taskMenu.add(new Menu("삭제", Menu.ENABLE_LOGIN) {
       public void execute() {
         taskHandler.delete(); 
       }});
