@@ -8,7 +8,6 @@ import com.eomcs.menu.MenuGroup;
 import com.eomcs.pms.domain.Board;
 import com.eomcs.pms.domain.Member;
 import com.eomcs.pms.domain.Project;
-import com.eomcs.pms.domain.Task;
 import com.eomcs.pms.handler.AuthHandler;
 import com.eomcs.pms.handler.BoardHandler;
 import com.eomcs.pms.handler.MemberHandler;
@@ -17,16 +16,14 @@ import com.eomcs.pms.handler.TaskHandler;
 import com.eomcs.util.Prompt;
 
 public class App {
-
   List<Board> boardList = new ArrayList<>();
   List<Member> memberList = new LinkedList<>();
   List<Project> projectList = new ArrayList<>();
-  List<Task> taskList = new LinkedList<>();
 
   BoardHandler boardHandler = new BoardHandler(boardList);
   MemberHandler memberHandler = new MemberHandler(memberList);
   ProjectHandler projectHandler = new ProjectHandler(projectList, memberHandler);
-  TaskHandler taskHandler = new TaskHandler(taskList, memberHandler);
+  TaskHandler taskHandler = new TaskHandler(projectHandler);
   AuthHandler authHandler = new AuthHandler(memberList);
 
   public static void main(String[] args) {
@@ -46,19 +43,21 @@ public class App {
     mainMenuGroup.add(new Menu("로그인", Menu.ENABLE_LOGOUT) {
       @Override
       public void execute() {
-        authHandler.login();
+        authHandler.login(); 
       }
     });
+
     mainMenuGroup.add(new Menu("내정보", Menu.ENABLE_LOGIN) {
       @Override
       public void execute() {
-        authHandler.displayLoginUser();
+        authHandler.displayLoginUser(); 
       }
     });
+
     mainMenuGroup.add(new Menu("로그아웃", Menu.ENABLE_LOGIN) {
       @Override
       public void execute() {
-        authHandler.logout();
+        authHandler.logout(); 
       }
     });
 
@@ -66,22 +65,27 @@ public class App {
     mainMenuGroup.add(boardMenu);
 
     boardMenu.add(new Menu("등록", Menu.ENABLE_LOGIN) {
+      @Override
       public void execute() {
         boardHandler.add(); 
       }});
     boardMenu.add(new Menu("목록") {
+      @Override
       public void execute() {
         boardHandler.list(); 
       }});
     boardMenu.add(new Menu("상세보기") {
+      @Override
       public void execute() {
         boardHandler.detail(); 
       }});
     boardMenu.add(new Menu("변경", Menu.ENABLE_LOGIN) {
+      @Override
       public void execute() {
         boardHandler.update(); 
       }});
     boardMenu.add(new Menu("삭제", Menu.ENABLE_LOGIN) {
+      @Override
       public void execute() {
         boardHandler.delete(); 
       }});
@@ -90,22 +94,27 @@ public class App {
     mainMenuGroup.add(memberMenu);
 
     memberMenu.add(new Menu("등록", Menu.ENABLE_LOGIN) {
+      @Override
       public void execute() {
         memberHandler.add(); 
       }});
     memberMenu.add(new Menu("목록") {
+      @Override
       public void execute() {
         memberHandler.list(); 
       }});
     memberMenu.add(new Menu("상세보기") {
+      @Override
       public void execute() {
         memberHandler.detail(); 
       }});
     memberMenu.add(new Menu("변경", Menu.ENABLE_LOGIN) {
+      @Override
       public void execute() {
         memberHandler.update(); 
       }});
     memberMenu.add(new Menu("삭제", Menu.ENABLE_LOGIN) {
+      @Override
       public void execute() {
         memberHandler.delete(); 
       }});
@@ -114,22 +123,27 @@ public class App {
     mainMenuGroup.add(projectMenu);
 
     projectMenu.add(new Menu("등록", Menu.ENABLE_LOGIN) {
+      @Override
       public void execute() {
         projectHandler.add(); 
       }});
     projectMenu.add(new Menu("목록") {
+      @Override
       public void execute() {
         projectHandler.list(); 
       }});
     projectMenu.add(new Menu("상세보기") {
+      @Override
       public void execute() {
         projectHandler.detail(); 
       }});
     projectMenu.add(new Menu("변경", Menu.ENABLE_LOGIN) {
+      @Override
       public void execute() {
         projectHandler.update(); 
       }});
     projectMenu.add(new Menu("삭제", Menu.ENABLE_LOGIN) {
+      @Override
       public void execute() {
         projectHandler.delete(); 
       }});
@@ -138,25 +152,31 @@ public class App {
     mainMenuGroup.add(taskMenu);
 
     taskMenu.add(new Menu("등록", Menu.ENABLE_LOGIN) {
+      @Override
       public void execute() {
         taskHandler.add(); 
       }});
     taskMenu.add(new Menu("목록") {
+      @Override
       public void execute() {
         taskHandler.list(); 
       }});
     taskMenu.add(new Menu("상세보기") {
+      @Override
       public void execute() {
         taskHandler.detail(); 
       }});
     taskMenu.add(new Menu("변경", Menu.ENABLE_LOGIN) {
+      @Override
       public void execute() {
         taskHandler.update(); 
       }});
     taskMenu.add(new Menu("삭제", Menu.ENABLE_LOGIN) {
+      @Override
       public void execute() {
         taskHandler.delete(); 
       }});
+
 
     return mainMenuGroup;
   }

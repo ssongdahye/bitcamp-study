@@ -51,14 +51,13 @@ public class AuthHandler {
   public void logout() {
     System.out.println("[로그아웃]");
 
-    this.loginUser = null;
+    loginUser = null;
     System.out.println("로그아웃 하였습니다.");
   }
 
-  private Member findByEmailPassword(String eamil, String password) {
-
+  private Member findByEmailPassword(String email, String password) {
     for (Member member : memberList) {
-      if (member.getEmail().equalsIgnoreCase(eamil) &&
+      if (member.getEmail().equalsIgnoreCase(email) &&
           member.getPassword().equals(password)) {
         return member;
       }
