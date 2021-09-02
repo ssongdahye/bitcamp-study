@@ -1,12 +1,10 @@
 package com.eomcs.pms.handler;
 
-import java.util.List;
 import com.eomcs.pms.domain.Member;
-import com.eomcs.util.Prompt;
 
-public class AuthUserInfoHandler {
+public class AuthUserInfoHandler implements Command {
 
-  public void displayLoginUser() {
+  public void execute() {
     System.out.println("[내정보]");
 
     Member loginUser = AuthLoginHandler.getLoginUser();

@@ -10,7 +10,7 @@ public class ProjectListHandler extends AbstractProjectHandler {
   }
 
   //다른 패키지에 있는 App 클래스가 다음 메서드를 호출할 수 있도록 공개한다.
-  public void list() {
+  public void execute() {
     System.out.println("[프로젝트 목록]");
 
     for (Project project : projectList) {
