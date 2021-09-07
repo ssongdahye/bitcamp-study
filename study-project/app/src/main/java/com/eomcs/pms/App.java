@@ -3,6 +3,10 @@ package com.eomcs.pms;
 import static com.eomcs.menu.Menu.ACCESS_ADMIN;
 import static com.eomcs.menu.Menu.ACCESS_GENERAL;
 import static com.eomcs.menu.Menu.ACCESS_LOGOUT;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -41,17 +45,20 @@ import com.eomcs.pms.handler.TaskListHandler;
 import com.eomcs.pms.handler.TaskUpdateHandler;
 import com.eomcs.util.Prompt;
 
+
 public class App {
   List<Board> boardList = new ArrayList<>();
   List<Member> memberList = new LinkedList<>();
   List<Project> projectList = new ArrayList<>();
 
-  HashMap<String, Command> commandMap = new HashMap<>();
+  HashMap<String,Command> commandMap = new HashMap<>();
+
   MemberPrompt memberPrompt = new MemberPrompt(memberList);
   ProjectPrompt projectPrompt = new ProjectPrompt(projectList);
 
   class MenuItem extends Menu {
     String menuId;
+
     public MenuItem(String title, String menuId) {
       super(title);
       this.menuId = menuId;
@@ -102,21 +109,67 @@ public class App {
 
     commandMap.put("/auth/login", new AuthLoginHandler(memberList));
     commandMap.put("/auth/logout", new AuthLogoutHandler());
-    commandMap.put("/auth/userInfo", new AuthUserInfoHandler());
-
+    commandMap.put("/auth/userinfo", new AuthUserInfoHandler());
   }
 
   void service() {
-    createMainManu().execute();
+    loadBoards();
+
+    createMainMenu().execute();
     Prompt.close();
+
+    saveBoards();
   }
 
-  Menu createMainManu() {
+  @SuppressWarnings("unchecked")
+  private void loadBoards() {
+    // 파일에서 게시글 데이터를 가져오기(로딩하기, 읽기)
+    // => 저장할 때 사용한 규칙에 따라 읽어야 한다.
+    // => 즉 파일 포맷에 맞춰 읽는다.
+    try (ObjectInputStream in = new ObjectInputStream(
+        new FileInputStream("board.data3"))) {
+
+      boardList.addAll(((List<Board>) in.readObject()));
+
+      System.out.println("게시글 로딩 완료!");
+
+    } catch (Exception e) {
+      System.out.println("파일에서 게시글을 읽어 오는 중 오류 발생!");
+      e.printStackTrace();
+    }
+  }
+
+  private void saveBoards() {
+    // 게시글 데이터를 파일로 내보내기(저장하기, 쓰기)
+    try (ObjectOutputStream out = new ObjectOutputStream(
+        new FileOutputStream("board.data3"))) {
+
+      out.writeObject(boardList);
+
+      System.out.println("게시글 저장 완료!");
+
+    } catch (Exception e) {
+      System.out.println("게시글을 파일에 저장 중 오류 발생!");
+      e.printStackTrace();
+    }
+    // 이렇게 게시글 데이터를 저장할 때 다음과 같이 나름의 형식에 따라 데이터를 출력한다.
+    // - 처음 4바이트는 저장할 게시글의 개수이고,
+    // - 그 다음 4바이트는 게시글 번호이고,
+    // - 그 다음 2바이트는 제목의 바이트 개수이고 등등 
+    // 파일에 데이터를 출력할 때 사용하는 규칙을 "파일 포맷(format)"이라 부른다.
+    // 당연히 파일에서 데이터를 읽을 때는 저장한 규칙에 맞춰 읽어야 한다.
+    // 즉 "파일 포맷"에 맞춰 읽어야 한다.
+    // .ppt 파일을 읽을 때는 ppt 파일 포맷에 맞춰 읽어야 하고,
+    // .gif 파일을 읽을 때는 gif 파일 포맷에 맞춰 읽어야 한다.
+    // 만약 파일 포맷을 모른다면 해당 파일을 제대로 읽을 수가 없다.
+  }
+
+  Menu createMainMenu() {
     MenuGroup mainMenuGroup = new MenuGroup("메인");
     mainMenuGroup.setPrevMenuTitle("종료");
 
-    mainMenuGroup.add(new MenuItem("로그인", ACCESS_LOGOUT, "/auth/login"));
-    mainMenuGroup.add(new MenuItem("내정보", ACCESS_GENERAL, "/auth/userInfo"));
+    mainMenuGroup.add(new MenuItem("로그인", ACCESS_LOGOUT , "/auth/login"));
+    mainMenuGroup.add(new MenuItem("내정보", ACCESS_GENERAL, "/auth/userinfo"));
     mainMenuGroup.add(new MenuItem("로그아웃", ACCESS_GENERAL, "/auth/logout"));
 
     mainMenuGroup.add(createBoardMenu());
@@ -124,6 +177,7 @@ public class App {
     mainMenuGroup.add(createProjectMenu());
     mainMenuGroup.add(createTaskMenu());
     mainMenuGroup.add(createAdminMenu());
+
     return mainMenuGroup;
   }
 
@@ -140,7 +194,7 @@ public class App {
 
   private Menu createMemberMenu() {
     MenuGroup memberMenu = new MenuGroup("회원");
-    memberMenu.add(new MenuItem("등록", ACCESS_GENERAL,"/member/add"));
+    memberMenu.add(new MenuItem("등록", ACCESS_GENERAL, "/member/add"));
     memberMenu.add(new MenuItem("목록", "/member/list"));
     memberMenu.add(new MenuItem("상세보기", "/member/detail"));
     memberMenu.add(new MenuItem("변경", ACCESS_GENERAL, "/member/update"));
