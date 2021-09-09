@@ -7,6 +7,7 @@ import java.nio.charset.Charset;
 public class Exam0111 {
   public static void main(String[] args) throws Exception {
 
+    // Charset.isSupported : JVM에서 해당 문자열을 다룰수있는지
     System.out.println(Charset.isSupported("EUC-KR"));
 
     // 1) 출력 스트림 객체를 생성할 때  문자 집합을 지정하면 
