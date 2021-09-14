@@ -8,7 +8,7 @@ public class TaskListHandler extends AbstractTaskHandler {
     super(projectPrompt);
   }
 
-  //다른 패키지에 있는 App 클래스가 다음 메서드를 호출할 수 있도록 공개한다.
+  @Override
   public void execute() {
     System.out.println("[작업 목록]");
 

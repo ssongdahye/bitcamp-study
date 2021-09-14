@@ -46,8 +46,10 @@ public class ProjectAddHandler extends AbstractProjectHandler {
     project.setMembers(new ArrayList<>());
 
     projectList.add(project);
+
   }
 
+  @Override
   public void execute() {
     System.out.println("[프로젝트 등록]");
 
@@ -65,7 +67,6 @@ public class ProjectAddHandler extends AbstractProjectHandler {
 
     System.out.println("프로젝트를 저장했습니다!");
   }
-
 }
 
 

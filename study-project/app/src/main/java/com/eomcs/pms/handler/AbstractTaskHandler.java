@@ -32,7 +32,7 @@ public abstract class AbstractTaskHandler implements Command {
     }
   }
 
-  protected int promptStatus() {
+  protected static int promptStatus() {
     return promptStatus(-1);
   }
 
@@ -47,7 +47,6 @@ public abstract class AbstractTaskHandler implements Command {
     System.out.println("2: 완료");
     return Prompt.inputInt("> ");
   }
-
 }
 
 

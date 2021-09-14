@@ -3,10 +3,12 @@ package com.eomcs.pms;
 import static com.eomcs.menu.Menu.ACCESS_ADMIN;
 import static com.eomcs.menu.Menu.ACCESS_GENERAL;
 import static com.eomcs.menu.Menu.ACCESS_LOGOUT;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.nio.charset.Charset;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -113,55 +115,65 @@ public class App {
   }
 
   void service() {
-    loadBoards();
+
+    // CSV 형식으로 저장된 게시글 데이터를 파일에서 읽어 객체에 담는다.
+    try (BufferedReader in = new BufferedReader(
+        new FileReader("board.csv", Charset.forName("UTF-8")))) {
+
+      String csvStr = null;
+      while ((csvStr = in.readLine()) != null) {
+
+        // 1) 한 줄의 문자열을 콤마(,)로 분리한다.
+        String[] values = csvStr.split(",");
+
+        // 2) 콤마로 분리한 값을 Board 객체에 담는다.
+        Board b = new Board();
+        b.setNo(Integer.parseInt(values[0]));
+        b.setTitle(values[1]);
+        b.setContent(values[2]);
+        b.setRegisteredDate(Date.valueOf(values[3]));
+        b.setViewCount(Integer.valueOf(values[4]));
+        b.setLike(Integer.valueOf(values[5]));
+
+        // 3) 게시글을 작성한 회원 정보를 Member 객체에 담는다.
+        Member m = new Member();
+        m.setNo(Integer.valueOf(values[6]));
+        m.setName(values[7]);
+
+        // 4) Member 객체를 Board 객체의 작성자 필드에 저장한다.
+        b.setWriter(m);
+
+        // 5) 게시글 객체를 boardList 에 저장한다.
+        boardList.add(b);
+      }
+
+      System.out.println("게시글 데이터 로딩 완료!");
+    } catch (Exception e) {
+      System.out.println("게시글 데이터 로딩 오류!");
+    }
 
     createMainMenu().execute();
     Prompt.close();
 
-    saveBoards();
-  }
-
-  @SuppressWarnings("unchecked")
-  private void loadBoards() {
-    // 파일에서 게시글 데이터를 가져오기(로딩하기, 읽기)
-    // => 저장할 때 사용한 규칙에 따라 읽어야 한다.
-    // => 즉 파일 포맷에 맞춰 읽는다.
-    try (ObjectInputStream in = new ObjectInputStream(
-        new FileInputStream("board.data3"))) {
-
-      boardList.addAll(((List<Board>) in.readObject()));
-
-      System.out.println("게시글 로딩 완료!");
-
-    } catch (Exception e) {
-      System.out.println("파일에서 게시글을 읽어 오는 중 오류 발생!");
-      e.printStackTrace();
-    }
-  }
-
-  private void saveBoards() {
-    // 게시글 데이터를 파일로 내보내기(저장하기, 쓰기)
-    try (ObjectOutputStream out = new ObjectOutputStream(
-        new FileOutputStream("board.data3"))) {
-
-      out.writeObject(boardList);
-
-      System.out.println("게시글 저장 완료!");
+    // 게시글 데이터를 CSV 형식으로 출력한다.
+    try (PrintWriter out = new PrintWriter(
+        new FileWriter("board.csv", Charset.forName("UTF-8")));) {
+      for (Board board : boardList) {
+        out.printf("%d,%s,%s,%s,%d,%d,%d,%s\n",
+            board.getNo(),
+            board.getTitle(),
+            board.getContent(),
+            board.getRegisteredDate(),
+            board.getViewCount(),
+            board.getLike(),
+            board.getWriter().getNo(),
+            board.getWriter().getName());
+      } 
+      System.out.println("게시글 데이터 출력 완료!");
 
     } catch (Exception e) {
-      System.out.println("게시글을 파일에 저장 중 오류 발생!");
-      e.printStackTrace();
+      System.out.println("게시글 데이터 출력 오류!");
     }
-    // 이렇게 게시글 데이터를 저장할 때 다음과 같이 나름의 형식에 따라 데이터를 출력한다.
-    // - 처음 4바이트는 저장할 게시글의 개수이고,
-    // - 그 다음 4바이트는 게시글 번호이고,
-    // - 그 다음 2바이트는 제목의 바이트 개수이고 등등 
-    // 파일에 데이터를 출력할 때 사용하는 규칙을 "파일 포맷(format)"이라 부른다.
-    // 당연히 파일에서 데이터를 읽을 때는 저장한 규칙에 맞춰 읽어야 한다.
-    // 즉 "파일 포맷"에 맞춰 읽어야 한다.
-    // .ppt 파일을 읽을 때는 ppt 파일 포맷에 맞춰 읽어야 하고,
-    // .gif 파일을 읽을 때는 gif 파일 포맷에 맞춰 읽어야 한다.
-    // 만약 파일 포맷을 모른다면 해당 파일을 제대로 읽을 수가 없다.
   }
 
   Menu createMainMenu() {

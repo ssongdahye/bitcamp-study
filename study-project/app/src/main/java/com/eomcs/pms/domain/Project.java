@@ -73,6 +73,7 @@ public class Project {
     if (this.members == null) {
       return "";
     }
+
     StringBuilder names = new StringBuilder();
     for (Member member : this.members) {
       if (names.length() > 0) {

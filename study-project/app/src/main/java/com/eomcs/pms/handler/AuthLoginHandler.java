@@ -10,12 +10,11 @@ public class AuthLoginHandler implements Command {
   List<Member> memberList;
 
   static Member loginUser;
-  static int userAccessLevel = 0x01; // 기본은 로그아웃 된 상태이다.
+  static int userAccessLevel = Menu.ACCESS_LOGOUT; // 기본은 로그아웃 된 상태이다.
 
   public static Member getLoginUser() {
     return loginUser;
   }
-
   public static int getUserAccessLevel() {
     return userAccessLevel;
   }
@@ -24,6 +23,7 @@ public class AuthLoginHandler implements Command {
     this.memberList = memberList;
   }
 
+  @Override
   public void execute() {
     System.out.println("[로그인]");
 

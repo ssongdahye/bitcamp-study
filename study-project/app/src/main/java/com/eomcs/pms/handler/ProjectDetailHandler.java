@@ -6,10 +6,11 @@ import com.eomcs.util.Prompt;
 
 public class ProjectDetailHandler extends AbstractProjectHandler {
 
-  public ProjectDetailHandler (List<Project> projectList) {
+  public ProjectDetailHandler(List<Project> projectList) {
     super(projectList);
   }
 
+  @Override
   public void execute() {
     System.out.println("[프로젝트 상세보기]");
     int no = Prompt.inputInt("번호? ");

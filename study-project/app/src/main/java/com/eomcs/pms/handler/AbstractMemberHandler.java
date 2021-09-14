@@ -19,15 +19,6 @@ public abstract class AbstractMemberHandler implements Command {
     }
     return null;
   }
-
-  public boolean exist(String name) {
-    for (Member member : memberList) {
-      if (member.getName().equals(name)) {
-        return true;
-      }
-    }
-    return false;
-  }
 }
 
 
