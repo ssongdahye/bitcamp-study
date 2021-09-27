@@ -3,17 +3,11 @@ package com.eomcs.pms;
 import static com.eomcs.menu.Menu.ACCESS_ADMIN;
 import static com.eomcs.menu.Menu.ACCESS_GENERAL;
 import static com.eomcs.menu.Menu.ACCESS_LOGOUT;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.PrintWriter;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import com.eomcs.csv.CsvValue;
+import com.eomcs.context.ApplicationContextListener;
 import com.eomcs.menu.Menu;
 import com.eomcs.menu.MenuGroup;
 import com.eomcs.pms.domain.Board;
@@ -29,6 +23,7 @@ import com.eomcs.pms.handler.BoardListHandler;
 import com.eomcs.pms.handler.BoardSearchHandler;
 import com.eomcs.pms.handler.BoardUpdateHandler;
 import com.eomcs.pms.handler.Command;
+import com.eomcs.pms.handler.CommandRequest;
 import com.eomcs.pms.handler.MemberAddHandler;
 import com.eomcs.pms.handler.MemberDeleteHandler;
 import com.eomcs.pms.handler.MemberDetailHandler;
@@ -46,6 +41,8 @@ import com.eomcs.pms.handler.TaskDeleteHandler;
 import com.eomcs.pms.handler.TaskDetailHandler;
 import com.eomcs.pms.handler.TaskListHandler;
 import com.eomcs.pms.handler.TaskUpdateHandler;
+import com.eomcs.pms.listener.AppInitListener;
+import com.eomcs.pms.listener.FileListener;
 import com.eomcs.util.Prompt;
 
 
@@ -58,6 +55,20 @@ public class App {
 
   MemberPrompt memberPrompt = new MemberPrompt(memberList);
   ProjectPrompt projectPrompt = new ProjectPrompt(projectList);
+
+  // 옵저버 관련 필드와 메서드
+  // => 옵저버(리스너) 목록
+  List<ApplicationContextListener> listeners = new ArrayList<>();
+
+  // => 옵저버(리스너)를 등록하는 메서드
+  public void addApplicationContextListener(ApplicationContextListener listener) {
+    this.listeners.add(listener);
+  }
+
+  // => 옵저버(리스너)를 제거하는 메서드
+  public void removeApplicationContextListener(ApplicationContextListener listener) {
+    this.listeners.remove(listener);
+  }
 
   class MenuItem extends Menu {
     String menuId;
@@ -75,21 +86,35 @@ public class App {
     @Override
     public void execute() {
       Command command = commandMap.get(menuId);
-      command.execute();
+      try {
+        command.execute(new CommandRequest(commandMap));
+      } catch (Exception e) {
+        System.out.printf("%s 명령을 실행하는 중 오류 발생!\n", menuId);
+        e.printStackTrace();
+      }
     }
   }
 
   public static void main(String[] args) {
     App app = new App(); 
+
+    // 애플리케이션을 본격적으로 실행하기 전에 옵저버를 등록한다.
+    // => 이렇게 등록된 옵저버는 service()가 호출되거나/종료될 때 그 상태를 보고 받을 것이다.
+    // => 옵저버의 기능올 제거하고 싶다면, 언제든 등록하지 않으면 된다.
+    //    즉 기능을 추가하거나 빼기 쉽다.
+    app.addApplicationContextListener(new AppInitListener());
+    app.addApplicationContextListener(new FileListener());
+
     app.service();
   }
 
   public App() {
+
     commandMap.put("/board/add", new BoardAddHandler(boardList));
     commandMap.put("/board/list", new BoardListHandler(boardList));
-    commandMap.put("/board/detail", new BoardDetailHandler(boardList));
     commandMap.put("/board/update", new BoardUpdateHandler(boardList));
     commandMap.put("/board/delete", new BoardDeleteHandler(boardList));
+    commandMap.put("/board/detail", new BoardDetailHandler(boardList));
     commandMap.put("/board/search", new BoardSearchHandler(boardList));
 
     commandMap.put("/member/add", new MemberAddHandler(memberList));
@@ -115,78 +140,35 @@ public class App {
     commandMap.put("/auth/userinfo", new AuthUserInfoHandler());
   }
 
-  void service() {
+  private void notifyOnApplicationStarted() {
+    HashMap<String,Object> params = new HashMap<>();
+    params.put("boardList", boardList);
+    params.put("memberList", memberList);
+    params.put("projectList", projectList);
 
-    // 여러 타입의 CSV 데이터를 로딩하는 메서드
-    loadObjects("board.csv", boardList, Board.class);
-    loadObjects("member.csv", memberList, Member.class);
-    loadObjects("project.csv", projectList, Project.class);
+    for (ApplicationContextListener listener : listeners) {
+      listener.contextInitialized(params);
+    }
+  }
+
+  private void notifyOnApplicationEnded() {
+    HashMap<String,Object> params = new HashMap<>();
+    params.put("boardList", boardList);
+    params.put("memberList", memberList);
+    params.put("projectList", projectList);
+
+    for (ApplicationContextListener listener : listeners) {
+      listener.contextDestroyed(params);
+    }
+  }
+
+  void service() {
+    notifyOnApplicationStarted();
 
     createMainMenu().execute();
     Prompt.close();
 
-    // 여러 타입의 객체를 CSV 데이터로 출력하는 메서드
-    saveObjects("board.csv", boardList);
-    saveObjects("member.csv", memberList);
-    saveObjects("project.csv", projectList);
-
-  }
-
-  // 이전의 loadBoards()는 오직 Board 객체의 데이터만 로딩할 수 있었다.
-  // 다음의 loadObjects()는 Board 타입 외에 다른 타입의 객체도 로딩 할 수 있다.
-  // 단, CsvValue 규칙에 따라 만든 객체여야 한다.
-  // => 어찌되었든 다음과 같이 제네릭 문법을 사용하면 한 개의 메서드로
-  //    여러 타입의 객체를 다룰 수 있어서 유지보수하기 편하다.
-  private <E extends CsvValue> void loadObjects(
-      String filepath, // 데이터를 읽어 올 파일 경로 
-      List<E> list, // 로딩한 데이터를 객체로 만든 후 저장할 목록
-      Class<E> domainType // 생성할 객체의 타입정보
-      ) {
-    // CSV 형식으로 저장된 게시글 데이터를 파일에서 읽어 객체에 담는다.
-    try (BufferedReader in = new BufferedReader(
-        new FileReader(filepath, Charset.forName("UTF-8")))) {
-
-      String csvStr = null;
-      while ((csvStr = in.readLine()) != null) {
-
-        // 1) CSV 값을 저장할 객체를 준비한다.
-        E obj = domainType.getConstructor().newInstance();
-
-        // 2) 생성한 객체에 대해 CSV 값을 전달하여 필드에 저장시킨다.
-        obj.loadCsv(csvStr);
-
-        // 3) CSV 값으로 설정된 객체를 목록에 추가한다.
-        list.add(obj);
-      }
-
-      System.out.printf("%s 데이터 로딩 완료!\n", filepath);
-    } catch (Exception e) {
-      System.out.printf("%s 데이터 로딩 오류!\n", filepath);
-    }
-  }
-
-  // 이전의 saveBoards()는 오직 Board 객체의 데이터만 CSV 형식으로 출력할 수 있었다.
-  // 다음의 saveObjects()는 Board 타입 외에 다른 타입의 객체도 CSV 형식으로 출력할 수 있다.
-  // 단, List 에 저장되어 있는 객체가 CsvValue 규칙에 따라 만든 객체여야 한다.
-  // => 어찌되었든 다음과 같이 제네릭 문법을 사용하면 한 개의 메서드로
-  //    여러 타입의 객체를 다룰 수 있어서 유지보수하기 편하다.
-  private <E> void saveObjects(String filepath, List<? extends CsvValue> list) { 
-    // 게시글 데이터를 CSV 형식으로 출력한다.
-    try (PrintWriter out = new PrintWriter(
-        new BufferedWriter(
-            new FileWriter(filepath, Charset.forName("UTF-8"))))) {
-
-      // 파라미터 list에 들어 있는 객체는 최소한 CsvValue 라는 인터페이스를 구현한 객체이다.
-      for (CsvValue obj : list) {
-        // 따라서 list 객체에서 꺼낸 값은 CsvValue 타입의 객체이다.
-        // 그래서 다음과 같이 CsvValue 에 선언된 메서드를 호출할 수 있는 것이다.
-        out.println(obj.toCsvString());
-      } 
-      System.out.printf("%s 데이터 출력 완료!\n", filepath);
-
-    } catch (Exception e) {
-      System.out.printf("%s 데이터 출력 오류!\n", filepath);
-    }
+    notifyOnApplicationEnded();
   }
 
   Menu createMainMenu() {
