@@ -10,6 +10,8 @@ import com.eomcs.context.ApplicationContextListener;
 import com.eomcs.menu.Menu;
 import com.eomcs.menu.MenuFilter;
 import com.eomcs.menu.MenuGroup;
+import com.eomcs.pms.dao.BoardDao;
+import com.eomcs.pms.dao.impl.NetBoardDao;
 import com.eomcs.pms.handler.AuthLoginHandler;
 import com.eomcs.pms.handler.AuthLogoutHandler;
 import com.eomcs.pms.handler.AuthUserInfoHandler;
@@ -103,8 +105,11 @@ public class ClientApp {
 
   public ClientApp() throws Exception {
 
+    // 데이터 관리를 담당할 DAO 객체를 준비한다.
     // 서버와 통신을 담당할 객체 준비
     requestAgent = new RequestAgent("127.0.0.1", 8888);
+
+    BoardDao boardDao = new NetBoardDao(requestAgent);
 
     // Command 객체 준비
     commandMap.put("/member/add", new MemberAddHandler(requestAgent));
@@ -113,12 +118,12 @@ public class ClientApp {
     commandMap.put("/member/update", new MemberUpdateHandler(requestAgent));
     commandMap.put("/member/delete", new MemberDeleteHandler(requestAgent));
 
-    commandMap.put("/board/add", new BoardAddHandler(requestAgent));
-    commandMap.put("/board/list", new BoardListHandler(requestAgent));
-    commandMap.put("/board/detail", new BoardDetailHandler(requestAgent));
-    commandMap.put("/board/update", new BoardUpdateHandler(requestAgent));
-    commandMap.put("/board/delete", new BoardDeleteHandler(requestAgent));
-    commandMap.put("/board/search", new BoardSearchHandler(requestAgent));
+    commandMap.put("/board/add", new BoardAddHandler(boardDao));
+    commandMap.put("/board/list", new BoardListHandler(boardDao));
+    commandMap.put("/board/detail", new BoardDetailHandler(boardDao));
+    commandMap.put("/board/update", new BoardUpdateHandler(boardDao));
+    commandMap.put("/board/delete", new BoardDeleteHandler(boardDao));
+    commandMap.put("/board/search", new BoardSearchHandler(boardDao));
 
     commandMap.put("/auth/login", new AuthLoginHandler(requestAgent));
     commandMap.put("/auth/logout", new AuthLogoutHandler());
@@ -172,7 +177,7 @@ public class ClientApp {
   private Menu createBoardMenu() {
     MenuGroup boardMenu = new MenuGroup("게시판");
     boardMenu.setMenuFilter(menuFilter);
-    boardMenu.add(new MenuItem("등록", ACCESS_GENERAL, "/board/add"));
+    boardMenu.add(new MenuItem("등록", /* ACCESS_GENERAL, */ "/board/add"));
     boardMenu.add(new MenuItem("목록", "/board/list"));
     boardMenu.add(new MenuItem("상세보기", "/board/detail"));
     boardMenu.add(new MenuItem("검색", "/board/search"));
