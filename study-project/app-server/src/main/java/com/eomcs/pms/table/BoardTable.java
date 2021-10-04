@@ -1,23 +1,26 @@
 package com.eomcs.pms.table;
 
+import java.util.ArrayList;
 import com.eomcs.pms.domain.Board;
 import com.eomcs.server.DataProcessor;
 import com.eomcs.server.Request;
 import com.eomcs.server.Response;
 
 // 역할
-// - 게시글 데이터를 처리하는 조회하는 일을 한다.
-//
+// - 게시글 데이터를 처리하는 일을 한다.
+// 
 public class BoardTable extends JsonDataTable<Board> implements DataProcessor {
 
   public BoardTable() {
-    super("Board.json", Board.class);
+    super("board.json", Board.class);
   }
 
+  @Override
   public void execute(Request request, Response response) throws Exception {
     switch (request.getCommand()) {
       case "board.insert": insert(request, response); break;
       case "board.selectList": selectList(request, response); break;
+      case "board.selectListByKeyword": selectListByKeyword(request, response); break;
       case "board.selectOne": selectOne(request, response); break;
       case "board.update": update(request, response); break;
       case "board.delete": delete(request, response); break;
@@ -36,6 +39,23 @@ public class BoardTable extends JsonDataTable<Board> implements DataProcessor {
   private void selectList(Request request, Response response) throws Exception {
     response.setStatus(Response.SUCCESS);
     response.setValue(list);
+  }
+
+  private void selectListByKeyword(Request request, Response response) throws Exception {
+    String keyword = request.getParameter("keyword");
+
+    ArrayList<Board> searchResult = new ArrayList<>();
+    for (Board board : list) {
+      if (!board.getTitle().contains(keyword) &&
+          !board.getContent().contains(keyword) &&
+          !board.getWriter().getName().contains(keyword)) {
+        continue;
+      }
+      searchResult.add(board);
+    }
+
+    response.setStatus(Response.SUCCESS);
+    response.setValue(searchResult);
   }
 
   private void selectOne(Request request, Response response) throws Exception {
@@ -57,12 +77,11 @@ public class BoardTable extends JsonDataTable<Board> implements DataProcessor {
     int index = indexOf(board.getNo());
     if (index == -1) {
       response.setStatus(Response.FAIL);
-      response.setValue("해당 번호의 회원을 찾을 수 없습니다.");
+      response.setValue("해당 번호의 게시글을 찾을 수 없습니다.");
       return;
     }
 
     list.set(index, board);
-
     response.setStatus(Response.SUCCESS);
   }
 
@@ -73,10 +92,10 @@ public class BoardTable extends JsonDataTable<Board> implements DataProcessor {
     if (index == -1) {
       response.setStatus(Response.FAIL);
       response.setValue("해당 번호의 게시글을 찾을 수 없습니다.");
+      return;
     }
 
     list.remove(index);
-
     response.setStatus(Response.SUCCESS);
   }
 
@@ -97,7 +116,13 @@ public class BoardTable extends JsonDataTable<Board> implements DataProcessor {
     }
     return -1;
   }
+
 }
+
+
+
+
+
 
 
 
