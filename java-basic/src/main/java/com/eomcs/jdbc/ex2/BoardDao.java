@@ -28,11 +28,10 @@ public class BoardDao {
   public List<Board> findAll() throws Exception {
     try (Connection con = DriverManager.getConnection( //
         "jdbc:mysql://localhost:3306/studydb?user=study&password=1111");
-        PreparedStatement stmt = con.prepareStatement( //
-            "select * from x_board order by board_id desc");
-        ResultSet rs = stmt.executeQuery()) {
+        Statement stmt = con.createStatement();
+        ResultSet rs = stmt.executeQuery("select * from x_board order by board_id desc")) {
 
-      ArrayList<Board> arr = new ArrayList<>();
+      ArrayList<Board> list = new ArrayList<>();
       while (rs.next()) {
         Board board = new Board();
         board.setNo(rs.getInt("board_id"));
@@ -40,9 +39,9 @@ public class BoardDao {
         board.setContent(rs.getString("contents"));
         board.setRegisteredDate(rs.getDate("created_date"));
         board.setViewCount(rs.getInt("view_count"));
-        arr.add(board);
+        list.add(board);
       }
-      return arr;
+      return list;
     }
   }
 
@@ -77,23 +76,20 @@ public class BoardDao {
   public Board findBy(String no) throws Exception {
     try (Connection con = DriverManager.getConnection( //
         "jdbc:mysql://localhost:3306/studydb?user=study&password=1111");
-        PreparedStatement stmt = con.prepareStatement( //
-            "select * from x_board where board_id = ?")) {
+        Statement stmt = con.createStatement();
+        ResultSet rs = stmt.executeQuery("select * from x_board where board_id = " + no)) {
 
-      stmt.setString(1, no);
+      if (!rs.next())
+        return null;
 
-      try (ResultSet rs = stmt.executeQuery()) {
-        if (!rs.next())
-          return null;
+      Board board = new Board();
+      board.setNo(rs.getInt("board_id"));
+      board.setTitle(rs.getString("title"));
+      board.setContent(rs.getString("contents"));
+      board.setRegisteredDate(rs.getDate("created_date"));
+      board.setViewCount(rs.getInt("view_count"));
 
-        Board board = new Board();
-        board.setNo(rs.getInt("board_id"));
-        board.setTitle(rs.getString("title"));
-        board.setContent(rs.getString("contents"));
-        board.setRegisteredDate(rs.getDate("created_date"));
-        board.setViewCount(rs.getInt("view_count"));
-        return board;
-      }
+      return board;
     }
   }
 }
