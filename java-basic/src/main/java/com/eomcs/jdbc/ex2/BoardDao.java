@@ -7,7 +7,6 @@ package com.eomcs.jdbc.ex2;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -17,11 +16,13 @@ public class BoardDao {
   public int delete(int no) throws Exception {
     try (Connection con = DriverManager.getConnection( //
         "jdbc:mysql://localhost:3306/studydb?user=study&password=1111");
-        PreparedStatement stmt = con.prepareStatement( //
-            "delete from x_board where board_id=?")) {
+        Statement stmt = con.createStatement()) {
 
-      stmt.setInt(1, no);
-      return stmt.executeUpdate();
+      // 첨부파일 삭제
+      stmt.executeUpdate("delete from x_board_file where board_id=" + no);
+
+      // 게시글 삭제
+      return stmt.executeUpdate("delete from x_board where board_id=" + no);
     }
   }
 
@@ -61,15 +62,15 @@ public class BoardDao {
   public int update(Board board) throws Exception {
     try (Connection con = DriverManager.getConnection( //
         "jdbc:mysql://localhost:3306/studydb?user=study&password=1111");
-        PreparedStatement stmt = con.prepareStatement( //
-            "update x_board set title = ?, contents = ? where board_id = ?")) {
+        Statement stmt = con.createStatement()) {
 
-      stmt.setString(1, board.getTitle());
-      stmt.setString(2, board.getContent());
-      stmt.setInt(3, board.getNo());
-      stmt.executeUpdate();
+      String sql = String.format(
+          "update x_board set title ='%s', contents ='%s' where board_id =%d", 
+          board.getTitle(),
+          board.getContent(),
+          board.getNo());
 
-      return stmt.executeUpdate();
+      return stmt.executeUpdate(sql);
     }
   }
 
