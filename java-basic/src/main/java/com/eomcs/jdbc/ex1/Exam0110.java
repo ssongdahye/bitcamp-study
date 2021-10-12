@@ -44,6 +44,7 @@ public class Exam0110 {
       // 1) Driver 구현체의 인스턴스를 생성한다.
       java.sql.Driver mariadbDriver = new org.mariadb.jdbc.Driver();
       java.sql.Driver oracleDriver = new oracle.jdbc.OracleDriver();
+      // new oracle.jdbc.driver.OracleDriver(); -> 위에꺼랑 똑같음
       java.sql.Driver mssqlDriver = new com.microsoft.sqlserver.jdbc.SQLServerDriver();
 
       // 2) Driver 인스턴스를 드라이버 관리자에 등록한다.
@@ -65,10 +66,6 @@ public class Exam0110 {
 
       java.sql.Driver driver3 = DriverManager.getDriver("jdbc:sqlserver://");
       System.out.println(driver3);
-
-      // 다음과 같이 파라미터로 지정한 JDBC 드라이버를 못찾으면 예외가 발생한다.
-      java.sql.Driver driver4 = DriverManager.getDriver("jdbc:db2://");
-      System.out.println(driver4);
 
     } catch (SQLException e) {
       e.printStackTrace();
