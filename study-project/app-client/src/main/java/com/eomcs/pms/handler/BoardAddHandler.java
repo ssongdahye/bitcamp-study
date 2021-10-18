@@ -27,6 +27,8 @@ public class BoardAddHandler implements Command {
     board.setRegisteredDate(new Date(System.currentTimeMillis()));
 
     boardDao.insert(board);
+
+    System.out.println("게시글을 저장했습니다.");
   }
 }
 

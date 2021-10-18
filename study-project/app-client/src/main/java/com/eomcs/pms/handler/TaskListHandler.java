@@ -16,7 +16,7 @@ public class TaskListHandler implements Command {
 
     Project project = projectPrompt.promptProject();
     if (project == null) {
-      System.out.println("작업 등록을 취소합니다.");
+      System.out.println("작업 조회를 취소합니다.");
       return;
     }
 

@@ -2,6 +2,7 @@ package com.eomcs.pms.handler;
 
 import com.eomcs.pms.dao.BoardDao;
 import com.eomcs.pms.domain.Board;
+import com.eomcs.pms.domain.Member;
 import com.eomcs.util.Prompt;
 
 public class BoardDetailHandler implements Command {
@@ -33,10 +34,16 @@ public class BoardDetailHandler implements Command {
     System.out.printf("조회수: %d\n", board.getViewCount());
     System.out.println();
 
+    Member loginUser = AuthLoginHandler.getLoginUser(); 
+    if (loginUser == null || 
+        (board.getWriter().getNo() != loginUser.getNo() && !loginUser.getEmail().equals("root@test.com"))) {
+      return;
+    }
+
     request.setAttribute("no", no);
 
     while (true) {
-      String input = Prompt.inputString("변경(U), 삭제(D), 이전(0)> ");
+      String input = Prompt.inputString("변경(U), 삭제(D), 이전(0)>");
       switch (input) {
         case "U":
         case "u":
@@ -47,9 +54,9 @@ public class BoardDetailHandler implements Command {
           request.getRequestDispatcher("/board/delete").forward(request);
           return;
         case "0":
-          // 이전 메뉴로 나가기
           return;
-        default: System.out.println("명령엉가 올바르지 않습니다!");
+        default:
+          System.out.println("명령어가 올바르지 않습니다!");
       }
     }
   }

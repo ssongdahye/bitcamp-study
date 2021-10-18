@@ -6,6 +6,7 @@ import com.eomcs.pms.domain.Task;
 import com.eomcs.util.Prompt;
 
 public class TaskDetailHandler implements Command {
+
   ProjectPrompt projectPrompt;
 
   public TaskDetailHandler(ProjectPrompt projectPrompt) {
