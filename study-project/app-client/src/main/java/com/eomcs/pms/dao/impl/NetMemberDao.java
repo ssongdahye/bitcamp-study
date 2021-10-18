@@ -84,6 +84,12 @@ public class NetMemberDao implements MemberDao {
       throw new Exception(requestAgent.getObject(String.class));
     }
   }
+
+  @Override
+  public Member findByEmailAndPassword(String email, String password) throws Exception {
+    // TODO Auto-generated method stub
+    return null;
+  }
 }
 
 
