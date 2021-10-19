@@ -12,7 +12,7 @@ import com.eomcs.pms.domain.Project;
 import com.eomcs.pms.domain.Task;
 
 // 역할
-// - 게시글을 데이터를 서버를 통해 관리한다.
+// - 프로젝트 데이터를 DBMS 서버를 통해 관리한다.
 //
 public class MariadbProjectDao implements ProjectDao {
 
@@ -38,7 +38,7 @@ public class MariadbProjectDao implements ProjectDao {
         throw new Exception("프로젝트 데이터 입력 실패!");
       }
 
-      // 입력 된 프로젝트의 PK 값 꺼내기
+      // 입력된 프로젝트의 PK 값 꺼내기
       int projectNo = 0;
       try (ResultSet pkRS = stmt.getGeneratedKeys()) {
         if (pkRS.next()) {
@@ -58,12 +58,12 @@ public class MariadbProjectDao implements ProjectDao {
     }
   }
 
-  // 방법1 : 프로젝트 목록을 가져올 때 멤버 목록도 함께 가져오기
+  // 방법1: 프로젝트 목록을 가져올 때 멤버 목록도 함께 가져오기
   @Override
   public List<Project> findAll() throws Exception {
     try (PreparedStatement stmt = con.prepareStatement(
         "select"
-            + " p.project_no," 
+            + " p.project_no,"
             + " p.title,"
             + " p.start_dt,"
             + " p.end_dt,"
@@ -73,12 +73,12 @@ public class MariadbProjectDao implements ProjectDao {
             + " m2.member_no member_no,"
             + " m2.name member_name,"
             + " m2.email member_email"
-            + " from"
+            + " from" 
             + " pms_project p"
             + " inner join pms_member m on p.member_no=m.member_no"
             + " left outer join pms_project_member pm on p.project_no=pm.project_no"
             + " inner join pms_member m2 on pm.member_no=m2.member_no"
-            + " order by"
+            + " order by" 
             + " project_no desc, m2.name asc");
         ResultSet rs = stmt.executeQuery()) {
 
@@ -101,32 +101,33 @@ public class MariadbProjectDao implements ProjectDao {
           owner.setEmail(rs.getString("owner_email"));
 
           project.setOwner(owner);
+
           list.add(project);
           projectNo = project.getNo();
         }
 
-        // 프로젝트에 멤버가 있다면 기존 멤버 목록에 추가한다.
+        // 프로젝트의 멤버가 있다면 기존 멤버 목록에 추가한다.
         if (rs.getString("member_name") != null) {
           Member member = new Member();
           member.setNo(rs.getInt("member_no"));
           member.setName(rs.getString("member_name"));
           member.setEmail(rs.getString("member_email"));
-
           project.getMembers().add(member);
         }
       }
+
       return list;
     }
   }
 
-  // 방법2 : 프로젝트 목록을 가져온 후 각 프로젝트에 대해 멤버 목록을 가져오기
+  // 방법2: 프로젝트 목록을 가져온 후 각 프로젝트에 대해 멤버 목록을 가져오기
   //  @Override
   //  public List<Project> findAll() throws Exception {
   //    try (PreparedStatement stmt = con.prepareStatement(
-  //        "select"
-  //            + " p.project_no," 
+  //        "select" 
+  //            + " p.project_no,"
   //            + " p.title,"
-  //            + " p.start_dt," 
+  //            + " p.start_dt,"
   //            + " p.end_dt,"
   //            + " m.member_no,"
   //            + " m.name,"
@@ -135,17 +136,17 @@ public class MariadbProjectDao implements ProjectDao {
   //            + " inner join pms_member m on p.member_no=m.member_no"
   //            + " order by project_no desc");
   //        PreparedStatement stmt2 = con.prepareStatement(
-  //            "select"
-  //                + " pm.project_no,"
+  //            "select" 
+  //                + " pm.project_no, "
   //                + " m.member_no,"
   //                + " m.name,"
   //                + " m.email"
-  //                + " from"
+  //                + " from "
   //                + " pms_project_member pm"
   //                + " inner join pms_member m on pm.member_no=m.member_no"
   //                + " where"
   //                + " pm.project_no=?"
-  //                + " order by"
+  //                + " order by "
   //                + " m.name asc");
   //        ResultSet rs = stmt.executeQuery()) {
   //
@@ -189,7 +190,7 @@ public class MariadbProjectDao implements ProjectDao {
   public Project findByNo(int no) throws Exception {
     try (PreparedStatement stmt = con.prepareStatement(
         "select"
-            + " p.project_no," 
+            + " p.project_no,"
             + " p.title,"
             + " p.content,"
             + " p.start_dt,"
@@ -200,7 +201,7 @@ public class MariadbProjectDao implements ProjectDao {
             + " m2.member_no member_no,"
             + " m2.name member_name,"
             + " m2.email member_email"
-            + " from"
+            + " from" 
             + " pms_project p"
             + " inner join pms_member m on p.member_no=m.member_no"
             + " left outer join pms_project_member pm on p.project_no=pm.project_no"
@@ -228,16 +229,16 @@ public class MariadbProjectDao implements ProjectDao {
           project.setOwner(owner);
         }
 
-        // 프로젝트에 멤버가 있다면 기존 멤버 목록에 추가한다.
+        // 프로젝트의 멤버가 있다면 기존 멤버 목록에 추가한다.
         if (rs.getString("member_name") != null) {
           Member member = new Member();
           member.setNo(rs.getInt("member_no"));
           member.setName(rs.getString("member_name"));
           member.setEmail(rs.getString("member_email"));
-
           project.getMembers().add(member);
         }
       }
+
       return project;
     }
   }
@@ -270,7 +271,7 @@ public class MariadbProjectDao implements ProjectDao {
         stmt2.executeUpdate();
       }
 
-      // 프로젝트 새 멤버 입력
+      // => 프로젝트 새 멤버 입력
       try (PreparedStatement stmt2 = con.prepareStatement(
           "insert into pms_project_member(project_no,member_no) values(?,?)")) {
         for (Member member : project.getMembers()) {
@@ -289,7 +290,7 @@ public class MariadbProjectDao implements ProjectDao {
         PreparedStatement stmt2 = con.prepareStatement(
             "delete from pms_project_member where project_no=?")) {
 
-      // 프로젝트 멤버를 먼저 삭제한다.
+      // 프로젝트 멤버를 먼제 삭제한다.
       stmt2.setInt(1, no);
       stmt2.executeUpdate();
 
@@ -303,32 +304,20 @@ public class MariadbProjectDao implements ProjectDao {
 
   @Override
   public void insertTask(Task task) throws Exception {
-    //    requestAgent.request("project.task.insert", task);
-    //    if (requestAgent.getStatus().equals(RequestAgent.FAIL)) {
-    //      throw new Exception(requestAgent.getObject(String.class));
-    //    }
+
   }
 
   @Override
   public void deleteTask(int projectNo, int taskNo) throws Exception {
-    //    HashMap<String,String> params = new HashMap<>();
-    //    params.put("taskNo", String.valueOf(taskNo));
-    //    params.put("projectNo", String.valueOf(projectNo));
-    //
-    //    requestAgent.request("project.task.delete", params);
-    //    if (requestAgent.getStatus().equals(RequestAgent.FAIL)) {
-    //      throw new Exception(requestAgent.getObject(String.class));
-    //    }
+
   }
 
   @Override
   public void updateTask(Task task) throws Exception {
-    //    requestAgent.request("project.task.update", task);
-    //
-    //    if (requestAgent.getStatus().equals(RequestAgent.FAIL)) {
-    //      throw new Exception(requestAgent.getObject(String.class));
-    //    }
-    //  }
 
   }
+
 }
+
+
+
