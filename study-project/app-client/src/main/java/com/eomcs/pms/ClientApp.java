@@ -19,10 +19,6 @@ import com.eomcs.pms.dao.BoardDao;
 import com.eomcs.pms.dao.MemberDao;
 import com.eomcs.pms.dao.ProjectDao;
 import com.eomcs.pms.dao.TaskDao;
-import com.eomcs.pms.dao.impl.MybatisBoardDao;
-import com.eomcs.pms.dao.impl.MybatisMemberDao;
-import com.eomcs.pms.dao.impl.MybatisProjectDao;
-import com.eomcs.pms.dao.impl.MybatisTaskDao;
 import com.eomcs.pms.handler.AuthLoginHandler;
 import com.eomcs.pms.handler.AuthLogoutHandler;
 import com.eomcs.pms.handler.AuthUserInfoHandler;
@@ -60,6 +56,7 @@ public class ClientApp {
   Connection con;
 
   RequestAgent requestAgent;
+  SqlSession sqlSession;
 
   HashMap<String,Command> commandMap = new HashMap<>();
 
@@ -126,27 +123,27 @@ public class ClientApp {
         "jdbc:mysql://localhost:3306/studydb?user=study&password=1111");
 
     // Mybatis의 SqlSession 객체 준비
-    SqlSession sqlSession = new SqlSessionFactoryBuilder().build(Resources.getResourceAsStream(
+    sqlSession = new SqlSessionFactoryBuilder().build(Resources.getResourceAsStream(
         "com/eomcs/pms/conf/mybatis-config.xml")).openSession();
 
     // 데이터 관리를 담당할 DAO 객체를 준비한다.
-    BoardDao boardDao = new MybatisBoardDao(sqlSession);
-    MemberDao memberDao = new MybatisMemberDao(sqlSession);
-    ProjectDao projectDao = new MybatisProjectDao(sqlSession);
-    TaskDao taskDao = new MybatisTaskDao(sqlSession);
+    BoardDao boardDao = sqlSession.getMapper(BoardDao.class);
+    MemberDao memberDao = sqlSession.getMapper(MemberDao.class);
+    ProjectDao projectDao = sqlSession.getMapper(ProjectDao.class);
+    TaskDao taskDao = sqlSession.getMapper(TaskDao.class);
 
     // Command 객체 준비
-    commandMap.put("/member/add", new MemberAddHandler(memberDao));
+    commandMap.put("/member/add", new MemberAddHandler(memberDao, sqlSession));
     commandMap.put("/member/list", new MemberListHandler(memberDao));
     commandMap.put("/member/detail", new MemberDetailHandler(memberDao));
-    commandMap.put("/member/update", new MemberUpdateHandler(memberDao));
-    commandMap.put("/member/delete", new MemberDeleteHandler(memberDao));
+    commandMap.put("/member/update", new MemberUpdateHandler(memberDao, sqlSession));
+    commandMap.put("/member/delete", new MemberDeleteHandler(memberDao, sqlSession));
 
-    commandMap.put("/board/add", new BoardAddHandler(boardDao));
+    commandMap.put("/board/add", new BoardAddHandler(boardDao, sqlSession));
     commandMap.put("/board/list", new BoardListHandler(boardDao));
-    commandMap.put("/board/detail", new BoardDetailHandler(boardDao));
-    commandMap.put("/board/update", new BoardUpdateHandler(boardDao));
-    commandMap.put("/board/delete", new BoardDeleteHandler(boardDao));
+    commandMap.put("/board/detail", new BoardDetailHandler(boardDao, sqlSession));
+    commandMap.put("/board/update", new BoardUpdateHandler(boardDao, sqlSession));
+    commandMap.put("/board/delete", new BoardDeleteHandler(boardDao, sqlSession));
     commandMap.put("/board/search", new BoardSearchHandler(boardDao));
 
     commandMap.put("/auth/login", new AuthLoginHandler(memberDao));
@@ -155,18 +152,18 @@ public class ClientApp {
 
     MemberPrompt memberPrompt = new MemberPrompt(memberDao);
 
-    commandMap.put("/project/add", new ProjectAddHandler(projectDao, memberPrompt));
+    commandMap.put("/project/add", new ProjectAddHandler(projectDao, memberPrompt, sqlSession));
     commandMap.put("/project/list", new ProjectListHandler(projectDao));
     commandMap.put("/project/detail", new ProjectDetailHandler(projectDao));
-    commandMap.put("/project/update", new ProjectUpdateHandler(projectDao, memberPrompt));
-    commandMap.put("/project/delete", new ProjectDeleteHandler(projectDao));
+    commandMap.put("/project/update", new ProjectUpdateHandler(projectDao, memberPrompt, sqlSession));
+    commandMap.put("/project/delete", new ProjectDeleteHandler(projectDao, sqlSession));
 
     ProjectPrompt projectPrompt = new ProjectPrompt(projectDao);
-    commandMap.put("/task/add", new TaskAddHandler(taskDao));
+    commandMap.put("/task/add", new TaskAddHandler(taskDao, sqlSession));
     commandMap.put("/task/list", new TaskListHandler(projectPrompt, taskDao));
     commandMap.put("/task/detail", new TaskDetailHandler(taskDao));
-    commandMap.put("/task/update", new TaskUpdateHandler(taskDao));
-    commandMap.put("/task/delete", new TaskDeleteHandler(taskDao));
+    commandMap.put("/task/update", new TaskUpdateHandler(taskDao, sqlSession));
+    commandMap.put("/task/delete", new TaskDeleteHandler(taskDao, sqlSession));
   }
 
   // MenuGroup에서 사용할 필터를 정의한다.
@@ -249,6 +246,7 @@ public class ClientApp {
 
     // DBMS와 연결을 끊는다.
     con.close();
+    sqlSession.close();
   }
 
   public static void main(String[] args) throws Exception {
