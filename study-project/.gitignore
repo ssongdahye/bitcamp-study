@@ -3,3 +3,10 @@
 
 # Ignore Gradle build output directory
 build
+*.exe
+node_modules/
+temp/
+Debug/
+Release/
+html-exam/
+package-lock.json
